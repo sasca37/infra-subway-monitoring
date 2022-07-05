@@ -11,9 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Service
 public class PathService {
+    private static final Logger jsonLogger = LoggerFactory.getLogger("json");
     public SubwayPath findPath(List<Line> lines, Station source, Station target) {
         SubwayGraph graph = new SubwayGraph(SectionEdge.class);
         graph.addVertexWith(lines);
@@ -22,6 +26,7 @@ public class PathService {
         // 다익스트라 최단 경로 찾기
         DijkstraShortestPath dijkstraShortestPath = new DijkstraShortestPath(graph);
         GraphPath<Station, SectionEdge> path = dijkstraShortestPath.getPath(source, target);
+        jsonLogger.info("{}, {}", kv("SOURCE", source.getName()), kv("TARGET", target.getName()));
 
         return convertSubwayPath(path);
     }
